@@ -119,7 +119,6 @@ std::vector<Eigen::VectorXd> ComauIkSolver::getIk(const Eigen::Affine3d& T_base_
     }
     if (out_of_bound)
       continue;
-    ROS_INFO_STREAM("add - "<<solution.transpose());
     q_sols.push_back(solution);
   }
 
