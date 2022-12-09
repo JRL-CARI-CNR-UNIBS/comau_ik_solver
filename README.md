@@ -1,1 +1,3 @@
-# ur_ik_solver
+# comau_ik_solver
+
+for now, only parallelograms
