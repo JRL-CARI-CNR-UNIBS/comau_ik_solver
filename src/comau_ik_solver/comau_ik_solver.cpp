@@ -97,26 +97,11 @@ std::vector<Eigen::VectorXd> ComauIkSolver::getIk(const Eigen::Affine3d& T_base_
   {
 
     Eigen::VectorXd solution(6);
-    bool out_of_bound=false;
     for (size_t idx=0;idx<6;idx++)
-    {
-      if (std::isnan(q[idx]))
-      {
-        out_of_bound=true;
-        break;
-      }
-      else if (q[idx]>ub_(idx))
-      {
-        out_of_bound=true;
-        break;
-      }
-      else if (q[idx]<lb_(idx))
-      {
-        out_of_bound=true;
-        break;
-      }
       solution(idx)=q[idx];
-    }
+
+    bool out_of_bound=outOfBound(solution);
+
     if (out_of_bound)
       continue;
     q_sols.push_back(solution);
