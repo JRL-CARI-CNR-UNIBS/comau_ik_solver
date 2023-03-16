@@ -93,9 +93,9 @@ std::vector<Eigen::VectorXd> ComauIkSolver::getIk(const Eigen::Affine3d& T_base_
   std::vector<Eigen::VectorXd> q_sols;
 
   std::array<std::array<double,6>,8> sol=ik.comauIk(T_base_flange);
+
   for (std::array<double,6>& q: sol)
   {
-
     Eigen::VectorXd solution(6);
     for (size_t idx=0;idx<6;idx++)
       solution(idx)=q[idx];
@@ -105,6 +105,7 @@ std::vector<Eigen::VectorXd> ComauIkSolver::getIk(const Eigen::Affine3d& T_base_
     if (out_of_bound)
       continue;
     q_sols.push_back(solution);
+
   }
 
   return getMultiplicity(q_sols);
