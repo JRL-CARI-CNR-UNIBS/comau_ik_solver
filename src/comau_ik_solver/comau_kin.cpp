@@ -34,6 +34,7 @@ namespace comau
 
 ParallelogramIk::ParallelogramIk()
 {
+#ifdef COMAU_NJ_370_27
   z1 = 0.448;
   x2 = 0.460;
   z2 = 0.692;
@@ -42,6 +43,18 @@ ParallelogramIk::ParallelogramIk()
   z4 = 0.250;
   x5 = 1.050;
   x6 = 0.282;
+#endif
+
+#ifdef COMAU_NJ_220_27
+  z1 = 0.326;
+  x2 = 0.4;
+  z2 = 0.504;
+  z3 = 1.175;
+  x4 = 0.106;
+  z4 = 0.25;
+  x5 = 1.0233;
+  x6 = 0.227;
+#endif
 
   T0_j1.setIdentity();
   Tj1_1.setIdentity();

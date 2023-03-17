@@ -1,7 +1,15 @@
-<library path="lib/libcomau_ik_solver">
-  <class name="ik_solver/ComauIkSolver" type="ik_solver::ComauIkSolver" base_class_type="ik_solver::IkSolver">
+<library path="lib/libcomau_nj_370_27_ik_solver">
+  <class name="ik_solver/Comau_NJ_370_27_IkSolver" type="ik_solver::ComauIkSolver" base_class_type="ik_solver::IkSolver">
 		<description>
-			UR3 IK solver
+      Comau NJ-370-2.7 IK solver
 		</description>
 	</class>
+</library>
+
+<library path="lib/libcomau_nj_220_27_ik_solver">
+  <class name="ik_solver/Comau_NJ_220_27_IkSolver" type="ik_solver::ComauIkSolver" base_class_type="ik_solver::IkSolver">
+    <description>
+      Comau NJ-220-2.7 IK solver
+    </description>
+  </class>
 </library>
