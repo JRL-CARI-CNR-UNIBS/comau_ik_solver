@@ -46,7 +46,7 @@ protected:
 
   const unsigned int n_joints = 6;
   const unsigned int n_sol = 8;
-
+  virtual Eigen::Affine3d getFK(const Eigen::VectorXd& s);
   comau::ParallelogramIk ik;
 
 };

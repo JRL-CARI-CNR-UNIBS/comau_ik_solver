@@ -111,6 +111,14 @@ std::vector<Eigen::VectorXd> ComauIkSolver::getIk(const Eigen::Affine3d& T_base_
   return getMultiplicity(q_sols);
 }
 
+Eigen::Affine3d ComauIkSolver::getFK(const Eigen::VectorXd& s)
+{
+  std::array<double,6> q;
+  for (size_t idx=0;idx<6;idx++)
+    q.at(idx)=s(idx);
+  return ik.comauFk(q);
+
+}
 
 
 }   // end namespace ik_solver
