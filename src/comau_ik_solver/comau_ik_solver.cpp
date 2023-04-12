@@ -116,7 +116,8 @@ Eigen::Affine3d ComauIkSolver::getFK(const Eigen::VectorXd& s)
   std::array<double,6> q;
   for (size_t idx=0;idx<6;idx++)
     q.at(idx)=s(idx);
-  return ik.comauFk(q);
+  Eigen::Affine3d T_b_tool=ik.comauFk(q)*T_tool_flange_.inverse();
+  return T_b_tool;
 
 }
 
