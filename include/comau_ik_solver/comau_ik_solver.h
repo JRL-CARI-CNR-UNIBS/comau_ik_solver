@@ -40,13 +40,15 @@ public:
                                      const std::vector<Eigen::VectorXd> & seeds,
                                      const int& desired_solutions,
                                      const int& max_stall_iterations) override;
+
+  virtual Eigen::Affine3d getFK(const Eigen::VectorXd& s) override;
 protected:
   virtual bool customConfig() override;
 
 
   const unsigned int n_joints = 6;
   const unsigned int n_sol = 8;
-  virtual Eigen::Affine3d getFK(const Eigen::VectorXd& s);
+
   comau::ParallelogramIk ik;
 
 };
