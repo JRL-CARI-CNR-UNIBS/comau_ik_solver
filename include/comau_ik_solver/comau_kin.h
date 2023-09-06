@@ -33,27 +33,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // #define TOLERANCE 1e-3
 namespace comau
 {
-
 class ParallelogramIk
 {
 public:
   ParallelogramIk();
 
-  double z1 ;
-  double x2 ;
-  double z2 ;
-  double z3 ;
-  double x4 ;
-  double z4 ;
-  double x5 ;
-  double x6 ;
+  double z1;
+  double x2;
+  double z2;
+  double z3;
+  double x4;
+  double z4;
+  double x5;
+  double x6;
+
 public:
-  std::array<std::array<double,6>,8> comauIk(const Eigen::Affine3d& T06);
-  Eigen::Affine3d comauFk(std::array<double,6>& q);
+  std::array<std::array<double, 6>, 8> comauIk(const Eigen::Affine3d& T06);
+  Eigen::Affine3d comauFk(std::array<double, 6>& q);
+
 protected:
-
-
-
   Eigen::Affine3d T0_j1;
   Eigen::Affine3d Tj1_1;
   Eigen::Affine3d T1_j2;
@@ -68,25 +66,11 @@ protected:
   Eigen::Affine3d Tj6_6;
   Eigen::Affine3d T6_f;
 
+  void computeQ2Q3(const double& pj2_5x, const double& pj2_5z, double& q2_1, double& q3_1, double& q2_2, double& q3_2);
 
+  std::array<std::array<double, 3>, 2> comauWrist(const Eigen::Matrix3d& R36);
 
-
-  void computeQ2Q3(const double& pj2_5x,
-                   const double& pj2_5z,
-                   double& q2_1,
-                   double& q3_1,
-                   double& q2_2,
-                   double& q3_2);
-
-  std::array<std::array<double,3>,2> comauWrist(const Eigen::Matrix3d& R36);
-
-
-  Eigen::Affine3d computeFK03(const double& q1,
-                              const double& q2,
-                              const double& q3);
-
-
-
+  Eigen::Affine3d computeFK03(const double& q1, const double& q2, const double& q3);
 };
 
-}  //  namespace ik_solver
+}  // namespace comau

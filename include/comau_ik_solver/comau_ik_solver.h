@@ -33,23 +33,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // #define TOLERANCE 1e-3
 namespace ik_solver
 {
-class ComauIkSolver: public IkSolver
+class ComauIkSolver : public IkSolver
 {
 public:
   virtual std::vector<Eigen::VectorXd> getIk(const Eigen::Affine3d& T_base_flange,
-                                     const std::vector<Eigen::VectorXd> & seeds,
-                                     const int& desired_solutions,
-                                     const int& max_stall_iterations) override;
+                                             const std::vector<Eigen::VectorXd>& seeds,
+                                             const int& desired_solutions,
+                                             const int& max_stall_iterations) override;
 
   virtual Eigen::Affine3d getFK(const Eigen::VectorXd& s) override;
+
 protected:
   virtual bool customConfig() override;
-
 
   const unsigned int n_joints = 6;
   const unsigned int n_sol = 8;
 
   comau::ParallelogramIk ik;
-
 };
 }  //  namespace ik_solver
