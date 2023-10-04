@@ -1,4 +1,4 @@
-type: ik_solver/ComauIkSolver
+type: ik_solver/Comau_NJ_220_27_IkSolver
 base_frame: base_link #world # base frame of the chain
 flange_frame: flange # end frame of the chain
 
