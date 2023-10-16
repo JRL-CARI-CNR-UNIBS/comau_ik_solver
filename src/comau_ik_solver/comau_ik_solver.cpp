@@ -111,7 +111,7 @@ std::vector<Eigen::VectorXd> ComauIkSolver::getIk(const Eigen::Affine3d& T_base_
   return getMultiplicity(q_sols);
 }
 
-std::vector<Eigen::VectorXd> ComauIkSolver::getIkSafeMT(bool& stop, const size_t& thread_id, 
+std::vector<Eigen::VectorXd> ComauIkSolver::getIkSafeMT(bool& stop, 
                                              const Eigen::Affine3d& T_base_flange,
                                              const std::vector<Eigen::VectorXd>& seeds,
                                              const int& desired_solutions,

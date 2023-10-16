@@ -13,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp ik_solver
+  roscpp ik_solver thread_pool_ros_package
 )
 
 catkin_package(
