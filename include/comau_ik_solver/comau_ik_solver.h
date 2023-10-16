@@ -41,6 +41,12 @@ public:
                                              const int& desired_solutions,
                                              const int& max_stall_iterations) override;
 
+  virtual std::vector<Eigen::VectorXd> getIkSafeMT(bool& stop, const size_t& thread_id, 
+                                             const Eigen::Affine3d& T_base_flange,
+                                             const std::vector<Eigen::VectorXd>& seeds,
+                                             const int& desired_solutions,
+                                             const int& max_stall_iterations) override;
+
   virtual Eigen::Affine3d getFK(const Eigen::VectorXd& s) override;
 
 protected:
@@ -50,5 +56,6 @@ protected:
   const unsigned int n_sol = 8;
 
   comau::ParallelogramIk ik;
+
 };
 }  //  namespace ik_solver

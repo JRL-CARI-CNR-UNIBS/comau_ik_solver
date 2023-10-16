@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <comau_ik_solver/comau_ik_solver.h>
 #include <comau_ik_solver/comau_kin.h>
 #include <pluginlib/class_list_macros.h>
+#include <stdexcept>
 
 PLUGINLIB_EXPORT_CLASS(ik_solver::ComauIkSolver, ik_solver::IkSolver)
 
@@ -92,7 +93,7 @@ std::vector<Eigen::VectorXd> ComauIkSolver::getIk(const Eigen::Affine3d& T_base_
 {
   std::vector<Eigen::VectorXd> q_sols;
 
-  std::array<std::array<double,6>,8> sol=ik.comauIk(T_base_flange);
+  std::array<std::array<double,6>,8> sol = ik.comauIk(T_base_flange);
 
   for (std::array<double,6>& q: sol)
   {
@@ -105,12 +106,19 @@ std::vector<Eigen::VectorXd> ComauIkSolver::getIk(const Eigen::Affine3d& T_base_
     if (out_of_bound)
       continue;
     q_sols.push_back(solution);
-
   }
 
   return getMultiplicity(q_sols);
 }
 
+std::vector<Eigen::VectorXd> ComauIkSolver::getIkSafeMT(bool& stop, const size_t& thread_id, 
+                                             const Eigen::Affine3d& T_base_flange,
+                                             const std::vector<Eigen::VectorXd>& seeds,
+                                             const int& desired_solutions,
+                                             const int& max_stall_iterations)
+{
+  throw std::runtime_error((__PRETTY_FUNCTION__ + std::string(": Not yet implemented!")).c_str());
+}
 Eigen::Affine3d ComauIkSolver::getFK(const Eigen::VectorXd& s)
 {
   std::array<double,6> q;
