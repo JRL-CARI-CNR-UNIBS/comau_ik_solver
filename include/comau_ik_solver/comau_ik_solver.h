@@ -28,24 +28,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
 
+#include <memory>
 #include <ik_solver/ik_solver_base_class.h>
 #include <comau_ik_solver/comau_kin.h>
+
 // #define TOLERANCE 1e-3
 namespace ik_solver
 {
 class ComauIkSolver : public IkSolver
 {
 public:
-  virtual std::vector<Eigen::VectorXd> getIk(const Eigen::Affine3d& T_base_flange,
-                                             const std::vector<Eigen::VectorXd>& seeds,
-                                             const int& desired_solutions,
-                                             const int& max_stall_iterations) override;
-
-  virtual std::vector<Eigen::VectorXd> getIkSafeMT(bool& stop, 
-                                             const Eigen::Affine3d& T_base_flange,
-                                             const std::vector<Eigen::VectorXd>& seeds,
-                                             const int& desired_solutions,
-                                             const int& max_stall_iterations) override;
+  virtual Configurations getIk(const Eigen::Affine3d& T_base_flange, const Configurations& seeds,
+                                 const int& desired_solutions, const int& max_stall_iterations) override;
 
   virtual Eigen::Affine3d getFK(const Eigen::VectorXd& s) override;
 
@@ -55,6 +49,6 @@ protected:
   const unsigned int n_joints = 6;
   const unsigned int n_sol = 8;
 
-  comau::ParallelogramIk ik;
+  std::shared_ptr<comau::ParallelogramIk> ik_;
 };
 }  //  namespace ik_solver

@@ -13,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp ik_solver thread_pool_ros_package
+  roscpp ik_solver
 )
 
 catkin_package(
@@ -30,35 +30,36 @@ include_directories(
 
 # Kinematics libraries
 
-add_library(comau_nj_370_27_kin src/${PROJECT_NAME}/comau_kin.cpp)
+add_library(comau_nj_370_27_kin include/comau_ik_solver/comau_kin.h src/${PROJECT_NAME}/comau_kin.cpp)
 set_target_properties(comau_nj_370_27_kin PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_370_27")
 #add_dependencies(comau_nj_370_27_kin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(comau_nj_370_27_kin ${catkin_LIBRARIES})
 
-add_library(comau_nj_220_27_kin src/${PROJECT_NAME}/comau_kin.cpp)
+add_library(comau_nj_220_27_kin include/comau_ik_solver/comau_kin.h src/${PROJECT_NAME}/comau_kin.cpp)
 set_target_properties(comau_nj_220_27_kin PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_220_27")
 #add_dependencies(comau_nj_220_27_kin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(comau_nj_220_27_kin ${catkin_LIBRARIES})
 
+add_library(comau_nj_generic_kin include/comau_ik_solver/comau_kin.h src/${PROJECT_NAME}/comau_kin.cpp)
+set_target_properties(comau_nj_generic_kin PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_GENERIC")
+#add_dependencies(comau_nj_generic_kin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(comau_nj_generic_kin ${catkin_LIBRARIES})
+
 # IK Solver
-
-add_library(comau_nj_370_27_ik_solver
-  src/${PROJECT_NAME}/comau_ik_solver.cpp
-)
+add_library(comau_nj_370_27_ik_solver include/comau_ik_solver/comau_kin.h src/${PROJECT_NAME}/comau_ik_solver.cpp)
+set_target_properties(comau_nj_370_27_ik_solver PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_370_27")
 add_dependencies(comau_nj_370_27_ik_solver comau_nj_370_27_kin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(comau_nj_370_27_ik_solver
-    comau_nj_370_27_kin
-    ${catkin_LIBRARIES}
-)
+target_link_libraries(comau_nj_370_27_ik_solver comau_nj_370_27_kin ${catkin_LIBRARIES})
 
-add_library(comau_nj_220_27_ik_solver
-  src/${PROJECT_NAME}/comau_ik_solver.cpp
-)
+add_library(comau_nj_220_27_ik_solver include/comau_ik_solver/comau_kin.h src/${PROJECT_NAME}/comau_ik_solver.cpp)
+set_target_properties(comau_nj_220_27_ik_solver PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_220_27")
 add_dependencies(comau_nj_220_27_ik_solver comau_nj_220_27_kin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(comau_nj_220_27_ik_solver
-    comau_nj_220_27_kin
-    ${catkin_LIBRARIES}
-)
+target_link_libraries(comau_nj_220_27_ik_solver comau_nj_220_27_kin ${catkin_LIBRARIES})
+
+add_library(comau_nj_generic_ik_solver include/comau_ik_solver/comau_kin.h src/${PROJECT_NAME}/comau_ik_solver.cpp)
+set_target_properties(comau_nj_generic_ik_solver PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_GENERIC")
+add_dependencies(comau_nj_generic_ik_solver comau_nj_generic_kin ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(comau_nj_generic_ik_solver comau_nj_generic_kin ${catkin_LIBRARIES})
 
 
 # Nodes
@@ -72,6 +73,7 @@ target_link_libraries(comau_nj_220_27_ik_solver
 #)
 
 add_executable(comau_nj_370_27_ik_solver_node src/node.cpp)
+set_target_properties(comau_nj_370_27_ik_solver_node PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_370_27")
 add_dependencies(comau_nj_370_27_ik_solver_node comau_nj_370_27_ik_solver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(comau_nj_370_27_ik_solver_node
   comau_nj_370_27_kin
@@ -80,9 +82,20 @@ target_link_libraries(comau_nj_370_27_ik_solver_node
 )
 
 add_executable(comau_nj_220_27_ik_solver_node src/node.cpp)
+set_target_properties(comau_nj_220_27_ik_solver_node PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_220_27")
 add_dependencies(comau_nj_220_27_ik_solver_node comau_nj_220_27_ik_solver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(comau_nj_220_27_ik_solver_node
   comau_nj_220_27_kin
   comau_nj_220_27_ik_solver
   ${catkin_LIBRARIES}
 )
+
+add_executable(comau_nj_generic_solver_node src/node.cpp)
+set_target_properties(comau_nj_generic_solver_node PROPERTIES COMPILE_DEFINITIONS "COMAU_NJ_GENERIC")
+add_dependencies(comau_nj_generic_solver_node comau_nj_generic_ik_solver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(comau_nj_generic_solver_node
+  comau_nj_generic_kin
+  comau_nj_generic_ik_solver
+  ${catkin_LIBRARIES}
+)
+

@@ -16,8 +16,7 @@
   <build_export_depend>ik_solver</build_export_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>ik_solver</exec_depend>
-  <build_depend>thread_pool_ros_package</build_depend>
-
+  
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <ik_solver plugin="${prefix}/plugin.xml"/>
