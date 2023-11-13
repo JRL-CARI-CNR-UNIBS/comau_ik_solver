@@ -90,13 +90,6 @@ namespace comau
 #if defined(COMAU_NJ_220_27) || defined(COMAU_NJ_370_27)
 ParallelogramIk::ParallelogramIk()
 {
-#if defined(COMAU_NJ_220_27)
-  std::cerr << "********************************* I AM COMAU_NJ_220_27 *************************" << std::endl;
-#elif defined(COMAU_NJ_370_27)
-  std::cerr << "********************************* I AM COMAU_NJ_370_27 *************************" << std::endl;
-#else
-  std::cerr << "*********************************  AM I WHAT?????? *************************" << std::endl;
-#endif
   T0_j1.setIdentity();
   // Tj1_1.setIdentity();
   T1_j2.setIdentity();
@@ -132,7 +125,6 @@ ParallelogramIk::ParallelogramIk(const double _z1, const double _x2,const double
 : z1(_z1), x2(_x2),z2(_z2),z3(_z3),x4(_x4),z4(_z4),x5(_x5),x6(_x6)
 {
 
-  std::cerr << "********************************* I AM COMAU_NJ_GENERIC *************************" << std::endl;
   T0_j1.setIdentity();
   // Tj1_1.setIdentity();
   T1_j2.setIdentity();

@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <comau_ik_solver/comau_kin.h>
 #include <pluginlib/class_list_macros.h>
 #include <stdexcept>
+#include "ik_solver/ik_solver_base_class.h"
 
 #include <ik_solver/internal/utils.h>
 
@@ -38,8 +39,13 @@ PLUGINLIB_EXPORT_CLASS(ik_solver::ComauIkSolver, ik_solver::IkSolver)
 namespace ik_solver
 {
 
-bool ComauIkSolver::customConfig()
+bool ComauIkSolver::config(const ros::NodeHandle& nh, const std::string& param_ns)
 {
+  if(!IkSolver::config(nh,param_ns))
+  {
+    return false;
+  }
+
   if (base_frame_.find("base_link") == std::string::npos)
   {
     ROS_ERROR("%s/base_frame should be set equal to [PREFIX]base_link instead of %s", robot_nh_.getNamespace().c_str(),
