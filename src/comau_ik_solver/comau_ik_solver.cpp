@@ -98,7 +98,7 @@ bool ComauIkSolver::config(const ros::NodeHandle& nh, const std::string& param_n
 }
 
 Configurations ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Configurations& seeds,
-                                      const int& desired_solutions, const int& max_stall_iterations)
+                                      const int& desired_solutions, const int& min_stall_iterations, const int& max_stall_iterations)
 {
   Configurations q_sols;
 
