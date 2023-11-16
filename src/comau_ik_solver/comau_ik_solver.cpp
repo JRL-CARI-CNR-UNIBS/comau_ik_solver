@@ -97,9 +97,10 @@ bool ComauIkSolver::config(const ros::NodeHandle& nh, const std::string& param_n
   return true;
 }
 
-Configurations ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Configurations& seeds,
+Solutions ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Configurations& seeds, 
                                       const int& desired_solutions, const int& min_stall_iterations, const int& max_stall_iterations)
 {
+  Solutions ret;
   Configurations q_sols;
 
   std::array<std::array<double, 6>, 8> sol = ik_->comauIk(T_base_flange);
@@ -129,7 +130,13 @@ Configurations ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const 
     q_sols.push_back(solution);
   }
 
-  return ik_solver::getMultiplicity(q_sols,this->ub_, this->lb_, this->revolute_);
+  auto sols = ik_solver::getMultiplicity(q_sols,this->ub_, this->lb_, this->revolute_);
+  
+  ret.configurations() = sols;
+  ret.translation_residuals().resize(sols.size(),0.0);
+  ret.rotation_residuals().resize(sols.size(),0.0);
+  
+  return ret;
 }
 
 Eigen::Affine3d ComauIkSolver::getFK(const Eigen::VectorXd& s)
