@@ -106,7 +106,7 @@ int main(int argc, char** argv)
     tf::poseTFToEigen(location_transform, T06);
 
     std::cout << "T06:\n" << T06.matrix() << std::endl;
-    std::array<std::array<double, 6>, 8> sol = ik.comauIk(T06);
+    std::array<std::array<double, 6>, 8> sol = ik.comauIk(T06, 45*M_PI/180.0, 30*M_PI/180.0);
     for (std::array<double, 6>& q : sol)
     {
       assert(std::abs((T06.inverse() * ik.comauFk(q)).matrix().norm() - 2) < 1e-6);
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
     comau_ik_solver.config(ros::NodeHandle("~"), "/tapping_ik_solver/mounted_robot_ik/");
 
     std::cout << "T06:\n" << T06.matrix() << std::endl;
-    auto sol = ik.comauIk(T06);
+    auto sol = ik.comauIk(T06,45*M_PI/180.0, 30*M_PI/180.0);
     for (std::array<double, 6>& q : sol)
     {
       Eigen::VectorXd qq(6);

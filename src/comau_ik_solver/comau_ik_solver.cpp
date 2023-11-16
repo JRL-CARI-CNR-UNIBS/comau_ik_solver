@@ -69,6 +69,12 @@ bool ComauIkSolver::config(const ros::NodeHandle& nh, const std::string& param_n
     return false;
   }
 
+  gamma_min_ = 45 * M_PI / 180.0;
+  ros::param::get("gamma_min", gamma_min_);
+
+  epsilon_min_ = 30 * M_PI / 180.0;
+  ros::param::get("epsilon_min", epsilon_min_);
+
 #if defined (COMAU_NJ_GENERIC)
   urdf::JointConstSharedPtr j;
   j = model_.getJoint( "joint_1");
@@ -103,7 +109,7 @@ Solutions ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Confi
   Solutions ret;
   Configurations q_sols;
 
-  std::array<std::array<double, 6>, 8> sol = ik_->comauIk(T_base_flange);
+  std::array<std::array<double, 6>, 8> sol = ik_->comauIk(T_base_flange, gamma_min_, epsilon_min_);
 
   for (std::array<double, 6>& q : sol)
   {

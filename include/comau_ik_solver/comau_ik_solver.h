@@ -45,7 +45,9 @@ public:
 
 protected:
   
-
+  double gamma_min_;
+  double epsilon_min_;
+  
   const unsigned int n_joints = 6;
   const unsigned int n_sol = 8;
 

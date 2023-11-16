@@ -157,6 +157,35 @@ ParallelogramIk::ParallelogramIk(const double _z1, const double _x2,const double
 }
 #endif
 
+bool ParallelogramIk::checkQ2Q3(double q2, double q3, double gamma_min, double epsilon_min) const
+{
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /*
+  ASSUMPTION: PARALLEOGRAM is  RECTANGLE
+  Parallogram Angle in proxmimity of the robot shoulder : gamma
+  Parallogram Angle in proxmimity of the robot elbow    : epsilon
+
+  We have two limits:
+    - gamma_min
+    - epsilon_min
+
+  alpha = angle between the active crank and the horizontal axis
+  beta  = angle between link3 and the horizontal axis
+
+  gamma = pi - (alpha + beta) -> the angle of the parallelogram at corner the bottom is the complement to PI of alpha and beta
+  epsilon = (alpha+beta) -> the angle of the parallelogram at the top corner  is the complement to PI of gamma
+
+  alpha = -q3 -pi/2
+  beta = -q2 + pi/2
+
+  gamma > gamma_min     ==>  pi - (alpha + beta) > gamma_min  ==>   pi - (-q2-q3) > gamma_min ==> q2+q3 > gamma_min - pi
+  epsilon > epsilon_min ==> (alpha + beta) > epsilon_min      ==> (-q2-q3) > epsilon_min      ==> q2+q3 < -epsilon_min
+  */
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  return ((q2+q3) > std::fabs(gamma_min) - M_PI) && ((q2+q3) < -std::fabs(epsilon_min));
+
+}
+
 void ParallelogramIk::computeQ2Q3(const double& pj2_5x, const double& pj2_5z, double& q2_1, double& q3_1, double& q2_2,
                                   double& q3_2) const
 {
@@ -247,7 +276,7 @@ Eigen::Affine3d ParallelogramIk::computeFK03(const double& q1, const double& q2,
   return T03;
 }
 
-std::array<std::array<double, 6>, 8> ParallelogramIk::comauIk(const Eigen::Affine3d& T06) const
+std::array<std::array<double, 6>, 8> ParallelogramIk::comauIk(const Eigen::Affine3d& T06, double gamma_min, double epsilon_min) const
 {
   
   std::array<std::array<double, 6>, 8> solutions{};
@@ -268,49 +297,66 @@ std::array<std::array<double, 6>, 8> ParallelogramIk::comauIk(const Eigen::Affin
   Eigen::Vector3d pj2_5 = T0_j2.inverse() * p05;
 
   computeQ2Q3(pj2_5(0), pj2_5(2), q2_1, q3_1, q2_2, q3_2);
-  q2 = q2_1;
-  q3 = q3_1;
-  Eigen::Affine3d T03 = computeFK03(q1, q2, q3);
+  if(checkQ2Q3(q2_1, q3_1, gamma_min, epsilon_min))
+  {
+    q2 = q2_1;
+    q3 = q3_1;
+    Eigen::Affine3d T03 = computeFK03(q1, q2, q3);
 
-  Eigen::Affine3d T36 = T03.inverse() * T06;
-  std::array<std::array<double, 3>, 2> q456 = comauWrist(T36.linear().matrix());
-  solutions[0][0] = q1;
-  solutions[0][1] = q2;
-  solutions[0][2] = q3;
-  solutions[0][3] = q456[0][0];
-  solutions[0][4] = q456[0][1];
-  solutions[0][5] = q456[0][2];
+    Eigen::Affine3d T36 = T03.inverse() * T06;
+    std::array<std::array<double, 3>, 2> q456 = comauWrist(T36.linear().matrix());
+    solutions[0][0] = q1;
+    solutions[0][1] = q2;
+    solutions[0][2] = q3;
+    solutions[0][3] = q456[0][0];
+    solutions[0][4] = q456[0][1];
+    solutions[0][5] = q456[0][2];
 
-  solutions[1][0] = q1;
-  solutions[1][1] = q2;
-  solutions[1][2] = q3;
-  solutions[1][3] = q456[1][0];
-  solutions[1][4] = q456[1][1];
-  solutions[1][5] = q456[1][2];
+    solutions[1][0] = q1;
+    solutions[1][1] = q2;
+    solutions[1][2] = q3;
+    solutions[1][3] = q456[1][0];
+    solutions[1][4] = q456[1][1];
+    solutions[1][5] = q456[1][2];
+  }
+  else
+  {
+    std::fill(std::begin(solutions.at(0)), std::end(solutions.at(0)), std::nan("1"));
+    std::fill(std::begin(solutions.at(1)), std::end(solutions.at(1)), std::nan("1"));
+  }
 
   q1 = q1a;
-  q2 = q2_2;
-  q3 = q3_2;
-  T03 = computeFK03(q1, q2, q3);
 
-  T36 = T03.inverse() * T06;
+  if(checkQ2Q3(q2_2, q3_2, gamma_min, epsilon_min))
+  {
+    q2 = q2_2;
+    q3 = q3_2;
+    auto T03 = computeFK03(q1, q2, q3);
 
-  q456 = comauWrist(T36.linear().matrix());
-  auto s = std::to_string<3,2>(q456);
+    auto T36 = T03.inverse() * T06;
 
-  solutions[2][0] = q1;
-  solutions[2][1] = q2;
-  solutions[2][2] = q3;
-  solutions[2][3] = q456[0][0];
-  solutions[2][4] = q456[0][1];
-  solutions[2][5] = q456[0][2];
+    auto q456 = comauWrist(T36.linear().matrix());
+    auto s = std::to_string<3,2>(q456);
 
-  solutions[3][0] = q1;
-  solutions[3][1] = q2;
-  solutions[3][2] = q3;
-  solutions[3][3] = q456[1][0];
-  solutions[3][4] = q456[1][1];
-  solutions[3][5] = q456[1][2];
+    solutions[2][0] = q1;
+    solutions[2][1] = q2;
+    solutions[2][2] = q3;
+    solutions[2][3] = q456[0][0];
+    solutions[2][4] = q456[0][1];
+    solutions[2][5] = q456[0][2];
+
+    solutions[3][0] = q1;
+    solutions[3][1] = q2;
+    solutions[3][2] = q3;
+    solutions[3][3] = q456[1][0];
+    solutions[3][4] = q456[1][1];
+    solutions[3][5] = q456[1][2];
+  }
+  else
+  {
+    std::fill(std::begin(solutions.at(2)), std::end(solutions.at(2)), std::nan("1"));
+    std::fill(std::begin(solutions.at(3)), std::end(solutions.at(3)), std::nan("1"));
+  }
 
   // case B
   q1 = q1b;
@@ -320,46 +366,62 @@ std::array<std::array<double, 6>, 8> ParallelogramIk::comauIk(const Eigen::Affin
   pj2_5 = T0_j2.inverse() * p05;
 
   computeQ2Q3(pj2_5(0), pj2_5(2), q2_1, q3_1, q2_2, q3_2);
-  q2 = q2_1;
-  q3 = q3_1;
-  T03 = computeFK03(q1, q2, q3);
+  if(checkQ2Q3(q2_1, q3_1, gamma_min, epsilon_min))
+  {
+    q2 = q2_1;
+    q3 = q3_1;
+    auto T03 = computeFK03(q1, q2, q3);
 
-  T36 = T03.inverse() * T06;
-  q456 = comauWrist(T36.linear().matrix());
-  solutions[4][0] = q1;
-  solutions[4][1] = q2;
-  solutions[4][2] = q3;
-  solutions[4][3] = q456[0][0];
-  solutions[4][4] = q456[0][1];
-  solutions[4][5] = q456[0][2];
+    auto T36 = T03.inverse() * T06;
+    auto q456 = comauWrist(T36.linear().matrix());
+    solutions[4][0] = q1;
+    solutions[4][1] = q2;
+    solutions[4][2] = q3;
+    solutions[4][3] = q456[0][0];
+    solutions[4][4] = q456[0][1];
+    solutions[4][5] = q456[0][2];
 
-  solutions[5][0] = q1;
-  solutions[5][1] = q2;
-  solutions[5][2] = q3;
-  solutions[5][3] = q456[1][0];
-  solutions[5][4] = q456[1][1];
-  solutions[5][5] = q456[1][2];
+    solutions[5][0] = q1;
+    solutions[5][1] = q2;
+    solutions[5][2] = q3;
+    solutions[5][3] = q456[1][0];
+    solutions[5][4] = q456[1][1];
+    solutions[5][5] = q456[1][2];
+  }
+  else 
+  {
+    std::fill(std::begin(solutions.at(4)), std::end(solutions.at(4)), std::nan("1"));
+    std::fill(std::begin(solutions.at(5)), std::end(solutions.at(5)), std::nan("1"));  
+  }
 
   q1 = q1b;
-  q2 = q2_2;
-  q3 = q3_2;
-  T03 = computeFK03(q1, q2, q3);
+  if(checkQ2Q3(q2_1, q3_1, gamma_min, epsilon_min))
+  {
+    q2 = q2_2;
+    q3 = q3_2;
+    auto T03 = computeFK03(q1, q2, q3);
 
-  T36 = T03.inverse() * T06;
-  q456 = comauWrist(T36.linear().matrix());
-  solutions[6][0] = q1;
-  solutions[6][1] = q2;
-  solutions[6][2] = q3;
-  solutions[6][3] = q456[0][0];
-  solutions[6][4] = q456[0][1];
-  solutions[6][5] = q456[0][2];
+    auto T36 = T03.inverse() * T06;
+    auto q456 = comauWrist(T36.linear().matrix());
+    solutions[6][0] = q1;
+    solutions[6][1] = q2;
+    solutions[6][2] = q3;
+    solutions[6][3] = q456[0][0];
+    solutions[6][4] = q456[0][1];
+    solutions[6][5] = q456[0][2];
 
-  solutions[7][0] = q1;
-  solutions[7][1] = q2;
-  solutions[7][2] = q3;
-  solutions[7][3] = q456[1][0];
-  solutions[7][4] = q456[1][1];
-  solutions[7][5] = q456[1][2];
+    solutions[7][0] = q1;
+    solutions[7][1] = q2;
+    solutions[7][2] = q3;
+    solutions[7][3] = q456[1][0];
+    solutions[7][4] = q456[1][1];
+    solutions[7][5] = q456[1][2];
+  }
+  else 
+  {
+    std::fill(std::begin(solutions.at(6)), std::end(solutions.at(6)), std::nan("1"));
+    std::fill(std::begin(solutions.at(7)), std::end(solutions.at(7)), std::nan("1"));  
+  }
 
   return solutions;
 }

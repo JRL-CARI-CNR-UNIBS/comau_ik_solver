@@ -68,8 +68,35 @@ public:
 #endif
 
 public:
-  std::array<std::array<double, 6>, 8> comauIk(const Eigen::Affine3d& T06) const;
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /*
+  ASSUMPTION: PARALLEOGRAM is  RECTANGLE
+  Parallogram Angle in proxmimity of the robot shoulder : gamma
+  Parallogram Angle in proxmimity of the robot elbow    : epsilon
+
+  We have two limits:
+    - gamma_min
+    - epsilon_min
+
+  alpha = angle between the active crank and the horizontal axis
+  beta  = angle between link3 and the horizontal axis
+
+  gamma = pi - (alpha + beta) -> the angle of the parallelogram at corner the bottom is the complement to PI of alpha and beta
+  epsilon = (alpha+beta) -> the angle of the parallelogram at the top corner  is the complement to PI of gamma
+
+  alpha = -q3 -pi/2
+  beta = -q2 + pi/2
+
+  gamma > gamma_min     ==>  pi - (alpha + beta) > gamma_min  ==>   pi - (-q2-q3) > gamma_min ==> q2+q3 > gamma_min - pi
+  epsilon > epsilon_min ==> (alpha + beta) > epsilon_min      ==> (-q2-q3) > epsilon_min      ==> q2+q3 < -epsilon_min
+  */
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  std::array<std::array<double, 6>, 8> comauIk(const Eigen::Affine3d& T06, double gamma_min, double epsilon_min) const;
   Eigen::Affine3d comauFk(std::array<double, 6>& q) const;
+
+  bool checkQ2Q3(double q2, double q3, double gamma_min, double epsilon_min) const;
+
 
 protected:
   Eigen::Affine3d T0_j1;
