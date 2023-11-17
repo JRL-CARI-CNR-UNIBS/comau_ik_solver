@@ -69,11 +69,13 @@ bool ComauIkSolver::config(const ros::NodeHandle& nh, const std::string& param_n
     return false;
   }
 
-  gamma_min_ = 45 * M_PI / 180.0;
-  ros::param::get("gamma_min", gamma_min_);
+  double gamma_min_deg = 32;
+  ros::param::get(param_ns + "gamma_min_deg", gamma_min_deg);
+  gamma_min_ = gamma_min_deg * M_PI / 180.0;
 
-  epsilon_min_ = 30 * M_PI / 180.0;
-  ros::param::get("epsilon_min", epsilon_min_);
+  double epsilon_min_deg = 32;
+  ros::param::get(param_ns + "epsilon_min_deg", epsilon_min_deg);
+  epsilon_min_ = epsilon_min_deg * M_PI / 180.0;
 
 #if defined (COMAU_NJ_GENERIC)
   urdf::JointConstSharedPtr j;
