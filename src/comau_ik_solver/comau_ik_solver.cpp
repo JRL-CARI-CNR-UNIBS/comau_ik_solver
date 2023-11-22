@@ -122,7 +122,8 @@ Solutions ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Confi
     // }
     solution = Eigen::VectorXd::Map(&q[0], q.size());
 
-    auto out_of_bound = ik_solver::outOfBound(solution, this->ub_, this->lb_);
+    std::vector<int> out_of_bound;
+    ik_solver::outOfBound(solution, this->jb_, out_of_bound);
 
     if (out_of_bound.size())
     {
@@ -138,7 +139,7 @@ Solutions ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Confi
     q_sols.push_back(solution);
   }
 
-  auto sols = ik_solver::getMultiplicity(q_sols,this->ub_, this->lb_, this->revolute_);
+  auto sols = ik_solver::getMultiplicity(q_sols,this->jb_, this->revolute_);
   
   ret.configurations() = sols;
   ret.translation_residuals().resize(sols.size(),0.0);
@@ -151,7 +152,9 @@ Eigen::Affine3d ComauIkSolver::getFK(const Eigen::VectorXd& s)
 {
   std::array<double, 6> q;
   for (size_t idx = 0; idx < 6; idx++)
+  {
     q.at(idx) = s(idx);
+  }
   return ik_->comauFk(q);
 }
 

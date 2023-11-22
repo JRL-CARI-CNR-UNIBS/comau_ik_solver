@@ -138,7 +138,8 @@ int main(int argc, char** argv)
 
       std::cout << "IK/FK error: " << (T06.inverse() * ik.comauFk(q)).matrix().determinant() - 1.0 << "\t";
 
-      auto vv = ik_solver::outOfBound(qq, comau_ik_solver.ub(), comau_ik_solver.lb());
+      std::vector<int> vv;
+      ik_solver::outOfBound(qq, comau_ik_solver.jb(), vv);
       std::cout << "Axes out of Bound: ";
       for (const auto v : vv)
       {
