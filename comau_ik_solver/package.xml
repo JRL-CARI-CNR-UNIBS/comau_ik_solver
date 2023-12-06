@@ -11,14 +11,14 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>ik_solver</build_depend>
+  <build_depend>ik_solver_core</build_depend>
   <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>ik_solver</build_export_depend>
+  <build_export_depend>ik_solver_core</build_export_depend>
   <exec_depend>roscpp</exec_depend>
-  <exec_depend>ik_solver</exec_depend>
+  <exec_depend>ik_solver_core</exec_depend>
   
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <ik_solver plugin="${prefix}/plugin.xml"/>
+    
   </export>
 </package>

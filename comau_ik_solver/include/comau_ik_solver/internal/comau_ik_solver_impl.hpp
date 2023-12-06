@@ -26,30 +26,31 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+
+#ifndef COMAU_IK_SOLVER__INTERNAL__COMAU_IK_SOLVER_IMPL_H
+#define COMAU_IK_SOLVER__INTERNAL__COMAU_IK_SOLVER_IMPL_H
+
 #include <comau_ik_solver/comau_ik_solver.h>
-#include <comau_ik_solver/comau_kin.h>
 #include <pluginlib/class_list_macros.h>
-#include <stdexcept>
-#include "ik_solver/ik_solver_base_class.h"
-
-#include <ik_solver/internal/utils.h>
-
-PLUGINLIB_EXPORT_CLASS(ik_solver::ComauIkSolver, ik_solver::IkSolver)
+#include <ik_solver_core/utils.h>
+#include <ik_solver_core/ik_solver_base_class.h>
+#include <urdf_model/types.h>
+#include <memory>
 
 namespace ik_solver
 {
-
-bool ComauIkSolver::config(const ros::NodeHandle& nh, const std::string& param_ns)
+  
+template<typename P>
+inline bool ComauIkSolver<P>::config(IkSolverOptionsConstPtr opts, std::string& what)
 {
-  if(!IkSolver::config(nh,param_ns))
+  if(!IkSolver::config(opts, what))
   {
     return false;
   }
 
   if (base_frame_.find("base_link") == std::string::npos)
   {
-    ROS_ERROR("%s/base_frame should be set equal to [PREFIX]base_link instead of %s", robot_nh_.getNamespace().c_str(),
-              base_frame_.c_str());
+    what = "'base_frame' should be set equal to [PREFIX]base_link instead of "+ base_frame_+"'";
     return false;
   }
   std::string prefix = base_frame_;
@@ -64,54 +65,25 @@ bool ComauIkSolver::config(const ros::NodeHandle& nh, const std::string& param_n
 
   if (flange_frame_.find("flange") == std::string::npos)
   {
-    ROS_ERROR("%s/flange_frame should be set equal to [PREFIX]tool0 instead of %s", robot_nh_.getNamespace().c_str(),
-              flange_frame_.c_str());
+    what = "'flange_frame' should be set equal to [PREFIX]tool0 instead of '" +flange_frame_+"'";
     return false;
   }
 
-  double gamma_min_deg = 32;
-  ros::param::get(param_ns + "gamma_min_deg", gamma_min_deg);
-  gamma_min_ = gamma_min_deg * M_PI / 180.0;
+  opts_ = std::dynamic_pointer_cast<const ComauIkSolverOptions<P>>(opts);
 
-  double epsilon_min_deg = 32;
-  ros::param::get(param_ns + "epsilon_min_deg", epsilon_min_deg);
-  epsilon_min_ = epsilon_min_deg * M_PI / 180.0;
+  ik_.reset(new comau::ParallelogramIk(opts_->params_));
 
-#if defined (COMAU_NJ_GENERIC)
-  urdf::JointConstSharedPtr j;
-  j = model_.getJoint( "joint_1");
-  auto z1 = j->parent_to_joint_origin_transform.position.z;
-
-  j = model_.getJoint( "joint_2");
-  auto x2 = j->parent_to_joint_origin_transform.position.x;
-  auto z2 = j->parent_to_joint_origin_transform.position.z;
-
-  j = model_.getJoint( "joint_2m");
-  auto z3 = j->parent_to_joint_origin_transform.position.z;
-
-  j = model_.getJoint( "joint_4");
-  auto x4 = j->parent_to_joint_origin_transform.position.x;
-  auto z4 = j->parent_to_joint_origin_transform.position.z;
-
-  j = model_.getJoint( "joint_5");
-  auto x5 = j->parent_to_joint_origin_transform.position.x;
-
-  j = model_.getJoint( "joint_6");
-  auto x6 = j->parent_to_joint_origin_transform.position.x;
-  ik_.reset(new comau::ParallelogramIk(z1, x2,z2,z3,x4,z4,x5,x6));
-#else
-  ik_.reset(new comau::ParallelogramIk());
-#endif
   return true;
 }
 
-Solutions ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Configurations& seeds, 
+template<typename P>
+inline Solutions ComauIkSolver<P>::getIk(const Eigen::Affine3d& T_base_flange, const Configurations& seeds, 
                                       const int& desired_solutions, const int& min_stall_iterations, const int& max_stall_iterations)
 {
   Solutions ret;
   Configurations q_sols;
 
-  std::array<std::array<double, 6>, 8> sol = ik_->comauIk(T_base_flange, gamma_min_, epsilon_min_);
+  std::array<std::array<double, 6>, 8> sol = ik_->comauIk(T_base_flange, opts_->gamma_min_, opts_->epsilon_min_);
 
   for (std::array<double, 6>& q : sol)
   {
@@ -122,7 +94,8 @@ Solutions ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Confi
     // }
     solution = Eigen::VectorXd::Map(&q[0], q.size());
 
-    auto out_of_bound = ik_solver::outOfBound(solution, this->ub_, this->lb_);
+    std::vector<int> out_of_bound;
+    ik_solver::outOfBound(solution, this->jb_, out_of_bound);
 
     if (out_of_bound.size())
     {
@@ -138,7 +111,7 @@ Solutions ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Confi
     q_sols.push_back(solution);
   }
 
-  auto sols = ik_solver::getMultiplicity(q_sols,this->ub_, this->lb_, this->revolute_);
+  auto sols = ik_solver::getMultiplicity(q_sols,this->jb_, this->revolute_);
   
   ret.configurations() = sols;
   ret.translation_residuals().resize(sols.size(),0.0);
@@ -147,12 +120,17 @@ Solutions ComauIkSolver::getIk(const Eigen::Affine3d& T_base_flange, const Confi
   return ret;
 }
 
-Eigen::Affine3d ComauIkSolver::getFK(const Eigen::VectorXd& s)
+template<typename P>
+inline Eigen::Affine3d ComauIkSolver<P>::getFK(const Eigen::VectorXd& s)
 {
   std::array<double, 6> q;
   for (size_t idx = 0; idx < 6; idx++)
+  {
     q.at(idx) = s(idx);
+  }
   return ik_->comauFk(q);
 }
 
 }  // end namespace ik_solver
+
+#endif // COMAU_IK_SOLVER__INTERNAL__COMAU_IK_SOLVER_IMPL_H

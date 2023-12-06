@@ -26,49 +26,71 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#pragma once
+#ifndef COMAU_IK_SOLVER__COMAU_KIN_H
+#define COMAU_IK_SOLVER__COMAU_KIN_H
 
-#include <ik_solver/ik_solver_base_class.h>
+
+#include <ik_solver_core/ik_solver_base_class.h>
 #include <Eigen/Geometry>
 
 
 
 namespace comau
 {
+
+struct COMAU_NJ_PARAMS
+{
+  COMAU_NJ_PARAMS() = default;
+  virtual ~COMAU_NJ_PARAMS() = default;
+  double z1;
+  double x2;
+  double z2;
+  double z3;
+  double x4;
+  double z4;
+  double x5;
+  double x6;
+};
+
+struct COMAU_NJ_370_27_PARAMS : COMAU_NJ_PARAMS
+{
+  COMAU_NJ_370_27_PARAMS() = default;
+  virtual ~COMAU_NJ_370_27_PARAMS() = default;
+  constexpr static const double z1 = 0.44800000000;
+  constexpr static const double x2 = 0.46000000000;
+  constexpr static const double z2 = 0.69200000000;
+  constexpr static const double z3 = 1.05000000000;
+  constexpr static const double x4 = 0.15500000000;
+  constexpr static const double z4 = 0.25000000000;
+  constexpr static const double x5 = 1.05000000000;
+  constexpr static const double x6 = 0.28200000000;
+};
+
+struct COMAU_NJ_220_27_PARAMS : COMAU_NJ_PARAMS
+{
+  COMAU_NJ_220_27_PARAMS() = default;
+  virtual ~COMAU_NJ_220_27_PARAMS() = default;
+  constexpr static const double z1 = 0.326000000;
+  constexpr static const double x2 = 0.400000000;
+  constexpr static const double z2 = 0.504000000;
+  constexpr static const double z3 = 1.175000000;
+  constexpr static const double x4 = 0.106000000;
+  constexpr static const double z4 = 0.250000000;
+  constexpr static const double x5 = 1.023300000;
+  constexpr static const double x6 = 0.22700000;
+};
+
+
 class ParallelogramIk
 {
 public:
 
-#if defined(COMAU_NJ_GENERIC)
-  ParallelogramIk() = delete;
-  ParallelogramIk(const double z1, const double x2,const double z2,const double z3,const double x4,const double z4,const double x5,const double x6);
-
-  const double z1;
-  const double x2;
-  const double z2;
-  const double z3;
-  const double x4;
-  const double z4;
-  const double x5;
-  const double x6;
-
-#elif defined(COMAU_NJ_370_27) || defined(COMAU_NJ_220_27)
-  ParallelogramIk();
-
-  static const double z1;
-  static const double x2;
-  static const double z2;
-  static const double z3;
-  static const double x4;
-  static const double z4;
-  static const double x5;
-  static const double x6;
-#else
-  #error "The NJ Model has not been defined"
-#endif
-
-public:
+  const COMAU_NJ_PARAMS p_;
   
+  ParallelogramIk() = delete;
+  ParallelogramIk(const COMAU_NJ_PARAMS& params);
+  virtual ~ParallelogramIk() = default;
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /*
   ASSUMPTION: PARALLEOGRAM is  RECTANGLE
@@ -121,3 +143,6 @@ protected:
 };
 
 }  // namespace comau
+
+
+#endif  // COMAU_IK_SOLVER__COMAU_KIN_H

@@ -64,31 +64,31 @@ inline std::string to_string(const std::array<std::array<double, N>,M>& aa)
 namespace comau
 {
 
-#if defined(COMAU_NJ_370_27)
-  const double ParallelogramIk::z1 = 0.44800000000;
-  const double ParallelogramIk::x2 = 0.46000000000;
-  const double ParallelogramIk::z2 = 0.69200000000;
-  const double ParallelogramIk::z3 = 1.05000000000;
-  const double ParallelogramIk::x4 = 0.15500000000;
-  const double ParallelogramIk::z4 = 0.25000000000;
-  const double ParallelogramIk::x5 = 1.05000000000;
-  const double ParallelogramIk::x6 = 0.28200000000;
+// #if defined(COMAU_NJ_370_27)
+//   const double ParallelogramIk::z1 = 0.44800000000;
+//   const double ParallelogramIk::x2 = 0.46000000000;
+//   const double ParallelogramIk::z2 = 0.69200000000;
+//   const double ParallelogramIk::p_.z3 = 1.05000000000;
+//   const double ParallelogramIk::p_.x4 = 0.15500000000;
+//   const double ParallelogramIk::p_.z4 = 0.25000000000;
+//   const double ParallelogramIk::p_.x5 = 1.05000000000;
+//   const double ParallelogramIk::x6 = 0.28200000000;
 
-#elif defined(COMAU_NJ_220_27)
+// #elif defined(COMAU_NJ_220_27)
 
-  const double ParallelogramIk::z1 = 0.326000000;
-  const double ParallelogramIk::x2 = 0.400000000;
-  const double ParallelogramIk::z2 = 0.504000000;
-  const double ParallelogramIk::z3 = 1.175000000;
-  const double ParallelogramIk::x4 = 0.106000000;
-  const double ParallelogramIk::z4 = 0.250000000;
-  const double ParallelogramIk::x5 = 1.023300000;
-  const double ParallelogramIk::x6 = 0.22700000;
+//   const double ParallelogramIk::z1 = 0.326000000;
+//   const double ParallelogramIk::x2 = 0.400000000;
+//   const double ParallelogramIk::z2 = 0.504000000;
+//   const double ParallelogramIk::p_.z3 = 1.175000000;
+//   const double ParallelogramIk::p_.x4 = 0.106000000;
+//   const double ParallelogramIk::p_.z4 = 0.250000000;
+//   const double ParallelogramIk::p_.x5 = 1.023300000;
+//   const double ParallelogramIk::x6 = 0.22700000;
 
-#endif
+// #endif
 
-#if defined(COMAU_NJ_220_27) || defined(COMAU_NJ_370_27)
-ParallelogramIk::ParallelogramIk()
+
+ParallelogramIk::ParallelogramIk(const COMAU_NJ_PARAMS& p) : p_(p)
 {
   T0_j1.setIdentity();
   // Tj1_1.setIdentity();
@@ -104,58 +104,22 @@ ParallelogramIk::ParallelogramIk()
   // Tj6_6.setIdentity();
   T6_f.setIdentity();
 
-  T0_j1.translation()(2) = z1;
+  T0_j1.translation()(2) = p.z1;
 
-  T1_j2.translation()(0) = x2;
-  T1_j2.translation()(2) = z2;
+  T1_j2.translation()(0) = p.x2;
+  T1_j2.translation()(2) = p.z2;
 
-  T2_j3.translation()(2) = z3;
+  T2_j3.translation()(2) = p.z3;
 
-  T3_j4.translation()(0) = x4;
-  T3_j4.translation()(2) = z4;
+  T3_j4.translation()(0) = p.x4;
+  T3_j4.translation()(2) = p.z4;
 
-  T4_j5.translation()(0) = x5;
+  T4_j5.translation()(0) = p.x5;
 
-  T5_j6.translation()(0) = x6;
-
-  T6_f = Eigen::AngleAxisd(M_PI * 0.5, Eigen::Vector3d::UnitY());
-}
-#elif defined(COMAU_NJ_GENERIC)
-ParallelogramIk::ParallelogramIk(const double _z1, const double _x2,const double _z2,const double _z3,const double _x4,const double _z4,const double _x5,const double _x6)
-: z1(_z1), x2(_x2),z2(_z2),z3(_z3),x4(_x4),z4(_z4),x5(_x5),x6(_x6)
-{
-
-  T0_j1.setIdentity();
-  // Tj1_1.setIdentity();
-  T1_j2.setIdentity();
-  // Tj2_2.setIdentity();
-  T2_j3.setIdentity();
-  // Tj3_3.setIdentity();
-  T3_j4.setIdentity();
-  // Tj4_4.setIdentity();
-  T4_j5.setIdentity();
-  // Tj5_5.setIdentity();
-  T5_j6.setIdentity();
-  // Tj6_6.setIdentity();
-  T6_f.setIdentity();
-
-  T0_j1.translation()(2) = z1;
-
-  T1_j2.translation()(0) = x2;
-  T1_j2.translation()(2) = z2;
-
-  T2_j3.translation()(2) = z3;
-
-  T3_j4.translation()(0) = x4;
-  T3_j4.translation()(2) = z4;
-
-  T4_j5.translation()(0) = x5;
-
-  T5_j6.translation()(0) = x6;
+  T5_j6.translation()(0) = p.x6;
 
   T6_f = Eigen::AngleAxisd(M_PI * 0.5, Eigen::Vector3d::UnitY());
 }
-#endif
 
 bool ParallelogramIk::checkQ2Q3(double q2, double q3, double gamma_min, double epsilon_min) const
 {
@@ -189,16 +153,16 @@ bool ParallelogramIk::checkQ2Q3(double q2, double q3, double gamma_min, double e
 void ParallelogramIk::computeQ2Q3(const double& pj2_5x, const double& pj2_5z, double& q2_1, double& q3_1, double& q2_2,
                                   double& q3_2) const
 {
-  double delta = (pj2_5x * pj2_5x) * (x4 * x4) * 2.0 + (pj2_5x * pj2_5x) * (x5 * x5) * 2.0 +
-                 (pj2_5z * pj2_5z) * (x4 * x4) * 2.0 + (pj2_5z * pj2_5z) * (x5 * x5) * 2.0 +
-                 (pj2_5x * pj2_5x) * (z3 * z3) * 2.0 + (pj2_5x * pj2_5x) * (z4 * z4) * 2.0 +
-                 (pj2_5z * pj2_5z) * (z3 * z3) * 2.0 + (pj2_5z * pj2_5z) * (z4 * z4) * 2.0 -
-                 (x4 * x4) * (x5 * x5) * 6.0 + (x4 * x4) * (z3 * z3) * 2.0 - (x4 * x4) * (z4 * z4) * 2.0 +
-                 (x5 * x5) * (z3 * z3) * 2.0 - (x5 * x5) * (z4 * z4) * 2.0 + (z3 * z3) * (z4 * z4) * 2.0 -
-                 x4 * (x5 * x5 * x5) * 4.0 - (x4 * x4 * x4) * x5 * 4.0 - pj2_5x * pj2_5x * pj2_5x * pj2_5x -
-                 pj2_5z * pj2_5z * pj2_5z * pj2_5z - x4 * x4 * x4 * x4 - x5 * x5 * x5 * x5 - z3 * z3 * z3 * z3 -
-                 z4 * z4 * z4 * z4 - (pj2_5x * pj2_5x) * (pj2_5z * pj2_5z) * 2.0 + (pj2_5x * pj2_5x) * x4 * x5 * 4.0 +
-                 (pj2_5z * pj2_5z) * x4 * x5 * 4.0 + x4 * x5 * (z3 * z3) * 4.0 - x4 * x5 * (z4 * z4) * 4.0;
+  double delta = (pj2_5x * pj2_5x) * (p_.x4 * p_.x4) * 2.0 + (pj2_5x * pj2_5x) * (p_.x5 * p_.x5) * 2.0 +
+                 (pj2_5z * pj2_5z) * (p_.x4 * p_.x4) * 2.0 + (pj2_5z * pj2_5z) * (p_.x5 * p_.x5) * 2.0 +
+                 (pj2_5x * pj2_5x) * (p_.z3 * p_.z3) * 2.0 + (pj2_5x * pj2_5x) * (p_.z4 * p_.z4) * 2.0 +
+                 (pj2_5z * pj2_5z) * (p_.z3 * p_.z3) * 2.0 + (pj2_5z * pj2_5z) * (p_.z4 * p_.z4) * 2.0 -
+                 (p_.x4 * p_.x4) * (p_.x5 * p_.x5) * 6.0 + (p_.x4 * p_.x4) * (p_.z3 * p_.z3) * 2.0 - (p_.x4 * p_.x4) * (p_.z4 * p_.z4) * 2.0 +
+                 (p_.x5 * p_.x5) * (p_.z3 * p_.z3) * 2.0 - (p_.x5 * p_.x5) * (p_.z4 * p_.z4) * 2.0 + (p_.z3 * p_.z3) * (p_.z4 * p_.z4) * 2.0 -
+                 p_.x4 * (p_.x5 * p_.x5 * p_.x5) * 4.0 - (p_.x4 * p_.x4 * p_.x4) * p_.x5 * 4.0 - pj2_5x * pj2_5x * pj2_5x * pj2_5x -
+                 pj2_5z * pj2_5z * pj2_5z * pj2_5z - p_.x4 * p_.x4 * p_.x4 * p_.x4 - p_.x5 * p_.x5 * p_.x5 * p_.x5 - p_.z3 * p_.z3 * p_.z3 * p_.z3 -
+                 p_.z4 * p_.z4 * p_.z4 * p_.z4 - (pj2_5x * pj2_5x) * (pj2_5z * pj2_5z) * 2.0 + (pj2_5x * pj2_5x) * p_.x4 * p_.x5 * 4.0 +
+                 (pj2_5z * pj2_5z) * p_.x4 * p_.x5 * 4.0 + p_.x4 * p_.x5 * (p_.z3 * p_.z3) * 4.0 - p_.x4 * p_.x5 * (p_.z4 * p_.z4) * 4.0;
 
   if (delta < 0)
   {
@@ -207,19 +171,19 @@ void ParallelogramIk::computeQ2Q3(const double& pj2_5x, const double& pj2_5z, do
   }
 
   double den_q2 =
-      pj2_5z * z3 * 2.0 - x4 * x5 * 2.0 + pj2_5x * pj2_5x + pj2_5z * pj2_5z - x4 * x4 - x5 * x5 + z3 * z3 - z4 * z4;
-  double den_q3 = pj2_5z * x4 * 2.0 + pj2_5z * x5 * 2.0 - pj2_5x * z4 * 2.0 + x4 * x5 * 2.0 + pj2_5x * pj2_5x +
-                  pj2_5z * pj2_5z + x4 * x4 + x5 * x5 - z3 * z3 + z4 * z4;
+      pj2_5z * p_.z3 * 2.0 - p_.x4 * p_.x5 * 2.0 + pj2_5x * pj2_5x + pj2_5z * pj2_5z - p_.x4 * p_.x4 - p_.x5 * p_.x5 + p_.z3 * p_.z3 - p_.z4 * p_.z4;
+  double den_q3 = pj2_5z * p_.x4 * 2.0 + pj2_5z * p_.x5 * 2.0 - pj2_5x * p_.z4 * 2.0 + p_.x4 * p_.x5 * 2.0 + pj2_5x * pj2_5x +
+                  pj2_5z * pj2_5z + p_.x4 * p_.x4 + p_.x5 * p_.x5 - p_.z3 * p_.z3 + p_.z4 * p_.z4;
 
-  q2_1 = std::atan2(pj2_5x * z3 * 2.0 + sqrt(delta), den_q2) * 2.0;
-  q2_2 = std::atan2(pj2_5x * z3 * 2.0 - sqrt(delta), den_q2) * 2.0;
-  q3_1 = std::atan2(pj2_5x * x4 * 2.0 + pj2_5x * x5 * 2.0 + pj2_5z * z4 * 2.0 - sqrt(delta), den_q3) * -2.0;
-  q3_2 = std::atan2(pj2_5x * x4 * 2.0 + pj2_5x * x5 * 2.0 + pj2_5z * z4 * 2.0 + sqrt(delta), den_q3) * -2.0;
+  q2_1 = std::atan2(pj2_5x * p_.z3 * 2.0 + sqrt(delta), den_q2) * 2.0;
+  q2_2 = std::atan2(pj2_5x * p_.z3 * 2.0 - sqrt(delta), den_q2) * 2.0;
+  q3_1 = std::atan2(pj2_5x * p_.x4 * 2.0 + pj2_5x * p_.x5 * 2.0 + pj2_5z * p_.z4 * 2.0 - sqrt(delta), den_q3) * -2.0;
+  q3_2 = std::atan2(pj2_5x * p_.x4 * 2.0 + pj2_5x * p_.x5 * 2.0 + pj2_5z * p_.z4 * 2.0 + sqrt(delta), den_q3) * -2.0;
 
-  assert(std::abs(pj2_5x - (-z4 * cos(q3_1) - x4 * sin(q3_1) - x5 * sin(q3_1) + z3 * sin(q2_1))) < 1e-6);
-  assert(std::abs(pj2_5z - (x4 * cos(q3_1) + x5 * cos(q3_1) + z3 * cos(q2_1) - z4 * sin(q3_1))) < 1e-6);
-  assert(std::abs(pj2_5x - (-z4 * cos(q3_2) - x4 * sin(q3_2) - x5 * sin(q3_2) + z3 * sin(q2_2))) < 1e-6);
-  assert(std::abs(pj2_5z - (x4 * cos(q3_2) + x5 * cos(q3_2) + z3 * cos(q2_2) - z4 * sin(q3_2))) < 1e-6);
+  assert(std::abs(pj2_5x - (-p_.z4 * cos(q3_1) - p_.x4 * sin(q3_1) - p_.x5 * sin(q3_1) + p_.z3 * sin(q2_1))) < 1e-6);
+  assert(std::abs(pj2_5z - (p_.x4 * cos(q3_1) + p_.x5 * cos(q3_1) + p_.z3 * cos(q2_1) - p_.z4 * sin(q3_1))) < 1e-6);
+  assert(std::abs(pj2_5x - (-p_.z4 * cos(q3_2) - p_.x4 * sin(q3_2) - p_.x5 * sin(q3_2) + p_.z3 * sin(q2_2))) < 1e-6);
+  assert(std::abs(pj2_5z - (p_.x4 * cos(q3_2) + p_.x5 * cos(q3_2) + p_.z3 * cos(q2_2) - p_.z4 * sin(q3_2))) < 1e-6);
 }
 
 std::array<std::array<double, 3>, 2> ParallelogramIk::comauWrist(const Eigen::Matrix3d& R36) const
@@ -281,7 +245,7 @@ std::array<std::array<double, 6>, 8> ParallelogramIk::comauIk(const Eigen::Affin
   
   std::array<std::array<double, 6>, 8> solutions{};
 
-  Eigen::Vector3d p05 = T06.translation() - x6 * T06.linear() * Eigen::Vector3d::UnitZ();
+  Eigen::Vector3d p05 = T06.translation() - p_.x6 * T06.linear() * Eigen::Vector3d::UnitZ();
 
   double q1a = std::atan2(-p05(1), p05(0));
   double q1b = std::atan2(p05(1), -p05(0));

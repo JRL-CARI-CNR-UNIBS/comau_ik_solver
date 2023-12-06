@@ -1,0 +1,57 @@
+<!-- IK Plugin Configurator -->
+<library path="lib/libcomau_ik_solver_ros">
+  <class name="ik_solver/Comau_NJ_370_27_IkSolver" type="ik_solver::NJ370_27_IkSolver"
+    base_class_type="ik_solver::IkSolver">
+    <description>
+      Comau NJ-370-2.7 IK solver
+    </description>
+  </class>
+</library>
+
+<library path="lib/libcomau_ik_solver_ros">
+  <class name="ik_solver/Comau_NJ_220_27_IkSolver" type="ik_solver::NJ220_27_IkSolver"
+    base_class_type="ik_solver::IkSolver">
+    <description>
+      Comau NJ-220-2.7 IK solver
+    </description>
+  </class>
+</library>
+
+<library path="lib/libcomau_ik_solver_ros">
+  <class name="ik_solver/Comau_NJ_Generic_IkSolver" type="ik_solver::NJ_IkSolver"
+    base_class_type="ik_solver::IkSolver">
+    <description>
+      Comau Generic IK solver
+    </description>
+  </class>
+</library>
+<!-- IK Plugin Configurator - END -->
+
+<!-- Configurator Plugins -->
+<library path="lib/libcomau_ik_solver_ros">
+  <class name="ik_solver/Comau_NJ_370_27_IkSolver_Configurator" type="ik_solver::NJ370_27_IkSolverConfigurator"
+    base_class_type="ik_solver::IkSolver">
+    <description>
+      Comau NJ-370-2.7 IK solver
+    </description>
+  </class>
+</library>
+
+<library path="lib/libcomau_ik_solver_ros">
+  <class name="ik_solver/Comau_NJ_220_27_IkSolver_Configurator" type="ik_solver::NJ220_27_IkSolverConfigurator"
+    base_class_type="ik_solver::IkSolver">
+    <description>
+      Comau NJ-220-2.7 IK solver
+    </description>
+  </class>
+</library>
+
+<library path="lib/libcomau_ik_solver_ros">
+  <class name="ik_solver/Comau_NJ_Generic_IkSolver_Configurator_Configurator" type="ik_solver::NJ_IkSolverConfigurator"
+    base_class_type="ik_solver::IkSolver">
+    <description>
+      Comau Generic IK solver
+    </description>
+  </class>
+</library>
+<!-- Configurator Plugins END-->
