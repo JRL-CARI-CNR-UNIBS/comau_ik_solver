@@ -39,6 +39,11 @@ Therefore,
 
 The parameters *gamma_min* and *epsilon_min* are mandatory parameters to be inserted in the param configuration file.
 
+## The plugin
+
+The package builds three different plugins:
+The geometric dimensions of **Comau_NJ_370_27_IkSolver**** and **Comau_NJ_220_27_IkSolver** are embedded inside the cpp code. The **Comau_NJ_Generic_IkSolver** reads the dimensions from the URDF at the configuration stage.
+
 ## Config Parameters
 
 ```yaml
