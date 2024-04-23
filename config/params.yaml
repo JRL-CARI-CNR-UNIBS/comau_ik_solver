@@ -1,4 +1,17 @@
-type: ik_solver/Comau_NJ_220_27_IkSolver
+###################################################
+#
+# The param needed by the every plugin that inherits 
+# from ik_solver base class
+#
+###################################################
+
+# This param is inherited from the ik_solver base class.
+# This param tells the plugin loader to load the 
+# SPECIFIC_PLUGIN
+
+type: ik_solver/Comau_NJ_Generic_IkSolver # The package exposes three plugins: Comau_NJ_Generic_IkSolver, Comau_NJ_220_27_IkSolver, Comau_NJ_370_27_IkSolver
+
+# Parameters inherited from the ik_solver base class 
 base_frame: base_link #world # base frame of the chain
 flange_frame: flange # end frame of the chain
 
@@ -11,3 +24,7 @@ joint_names:
 - joint_4
 - joint_5
 - joint_6
+
+#Parameters specific for COMAU implementation
+gamma_min_deg: 40     # This parameter is used from the Comau_NJ_Generic_IkSolver. It used to avoid collision of the parallelogram.
+epsilon_min_deg: 40   # This parameter is used from the Comau_NJ_Generic_IkSolver. It used to avoid collision of the parallelogram.
