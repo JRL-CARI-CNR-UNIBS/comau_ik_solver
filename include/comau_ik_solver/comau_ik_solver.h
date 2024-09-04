@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <memory>
-#include <ik_solver_core/ik_solver_base_class.h>
+#include <ik_solver/ik_solver.hpp>
 #include <comau_ik_solver/comau_kin.h>
 
 // #define TOLERANCE 1e-3
